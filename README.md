@@ -1,34 +1,158 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Send Email with novu Infrastructure
 
-## Getting Started
+# What is Novu ?
 
-First, run the development server:
+## The open-source notification infrastructure for developers
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+Simple components and APIs for managing all communication channels in one place: Email, SMS, Direct, and Push
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# Steps :
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+- Step 1 :
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+  - creating `NextJs` project using `npx create-next-app@latest my-app`
+  - Clear out default code in `index.js` page.
+  - Clear out `css` in `home.module.css`
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+- Step 2 :
 
-## Learn More
+  - cerate api route in `pages/api` as `mail.js`
+  - write handler function as below
+  - ```
+      export default function handler(req, res) {
+      res.status(200).json({ name: 'Test' })
+      }
+    ```
+  - Test route `localhost:3000/api/mail` in browser
 
-To learn more about Next.js, take a look at the following resources:
+- Step 3 :
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+  - Now create a form in `index.js` under `Home` Component
+  - ```
+         <div className={styles.container}>
+      {/* Header */}
+      <div className={styles.headwrapper}>
+        <h1 className={styles.heading}>
+          Assign Task to Employess with Novu Notification Infrastructure
+        </h1>
+      </div>
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+      {/* form */}
+      <div className={styles.formwrapper}>
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label className={styles.label}>Employee Name</label>
+            <br />
+            <input
+              type="text"
+              placeholder="Enter Employee name here"
+              className={styles.input}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className={styles.label}>Employee Email</label>
+            <br />
+            <input
+              type="text"
+              placeholder="Enter Employee email here"
+              className={styles.input}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className={styles.label}>Task Name</label>
+            <br />
+            <input
+              type="text"
+              placeholder="Enter Task title here"
+              className={styles.input}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className={styles.label}>Task Description</label>
+            <br />
+            <textarea
+              type="text"
+              placeholder="Task description here"
+              className={styles.input}
+              style={{ height: "100px" }}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+          <button type="submit" className={styles.button}>
+            {message}
+          </button>
+        </form>
+      </div>
+    </div>
+    ```
 
-## Deploy on Vercel
+- Step 4
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+  - UPDATE `styles/Home.module.css` with our own css
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- Step 5
+
+  - cerate `useState` for `name`, `email`,`title`,`description`,`loading`and `message`
+  - ADD `onChnage` eventListener to each input and store values particular state
+
+- Step 6:
+
+  - Visit [Nouv website](https://web.novu.co/auth/login)
+  - sign in
+  - After sign in click on `notifications` on left side
+  - click `New` for create new notification
+  - fill the details
+  - Notification name : `task-details`
+  - Notification identifier : `task-details`
+  - Notification description : `Here you can get your daily task`
+  - Notification group : `General`
+
+- Step 7:
+
+  - Then click on `workflow editor`
+  - Drag `email` below the `trigger` component
+  - update template on click on `email component` -> `edit template`
+  - add this to `subject section`
+  - ```
+      Hey {{ name }}
+
+      Your Todays task is {{ title }}
+
+      Task Details : {{ description }}
+    ```
+
+  - update the changes
+
+- Step 8:
+
+  - click on `integration store` on left sidebar
+  - We are integrating `mailjet`
+  - create account on [Mailjet](https://www.mailjet.com/)
+  - after creating account `profile/account-setting/rest-api/api-key-management` and grab the secrets
+  - come to novu and add to mailjet credentials
+  - we have successfully integrated `mailjet` with `novu`
+
+- Step 9 :
+
+  - Now under `settings` tab on `novu website` there is one section called `Api keys`
+  - Copy `APi Keys` and get back to code
+  - crate `.env.local` file in root directory
+  - add following code
+  - ```
+    NOVU_API_KEY=<api-key>
+    ```
+
+- Step 10 :
+
+  - Write handler function in `pages/api/mail.js`
+  - install `npm i @novu/node`
+  - write the handler function where we are triggering novu with data we are passing from our form
+
+- Step 11 :
+
+  - create `handleSubmit` function in `pages/index.js` to create post request
+  - fetch `api/mail` and send our name,email,title,description data as body
+  - test with real email and check inbox email should be received
